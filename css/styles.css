@@ -77,19 +77,6 @@ footer a:hover {
     text-decoration: underline;
 }
 
-.variation-positive {
-    color: blue;
-}
-
-.variation-negative {
-    color: red;
-}
-
-.divisoria {
-    border-top: 2px solid #555;
-    height: 0;
-}
-
 @media (max-width: 768px) {
     th, td {
         padding: 4px; /* Padding reduzido */
@@ -103,4 +90,3 @@ footer a:hover {
         font-size: 1.8rem; /* Tamanho reduzido para telas menores */
     }
 }
-
