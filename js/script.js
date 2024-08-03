@@ -1,72 +1,84 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+document.addEventListener("DOMContentLoaded", () => {
+    const months = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
+
     const tableBody = document.getElementById("tableBody");
 
+    // Carregar dados armazenados no localStorage
+    const savedData = JSON.parse(localStorage.getItem("salesData")) || {};
+
     months.forEach((month, index) => {
-        // Adiciona uma divisória antes de cada linha do mês
-        if (index > 0) {
-            const divider = document.createElement("tr");
-            divider.classList.add("divisoria");
-            const dividerTd = document.createElement("td");
-            dividerTd.colSpan = 6;
-            divider.appendChild(dividerTd);
-            tableBody.appendChild(divider);
-        }
-
         const row = document.createElement("tr");
-
-        const monthCell = document.createElement("td");
-        monthCell.textContent = month;
-        row.appendChild(monthCell);
-
-        for (let i = 0; i < 5; i++) {
-            const cell = document.createElement("td");
-            const input = document.createElement("input");
-            input.type = "number";
-            input.addEventListener("input", updateVariations);
-            cell.appendChild(input);
-            row.appendChild(cell);
-        }
-
+        row.innerHTML = `
+            <td>${month}</td>
+            <td><input type="number" class="input" data-month="${index}" data-field="pieces" value="${savedData[index]?.pieces || ''}"></td>
+            <td><input type="number" class="input" data-month="${index}" data-field="sales" value="${savedData[index]?.sales || ''}"></td>
+            <td><input type="number" class="input" data-month="${index}" data-field="piecesPerSale" value="${savedData[index]?.piecesPerSale || ''}"></td>
+            <td><input type="number" class="input" data-month="${index}" data-field="salesValue" value="${savedData[index]?.salesValue || ''}"></td>
+            <td><input type="number" class="input" data-month="${index}" data-field="avgTicket" value="${savedData[index]?.avgTicket || ''}"></td>
+        `;
         tableBody.appendChild(row);
 
-        // Adiciona linha de variação
-        const variationRow = document.createElement("tr");
-        for (let i = 0; i < 6; i++) {
-            const cell = document.createElement("td");
-            if (i > 0) {
-                cell.classList.add("variation-cell");
-            }
-            variationRow.appendChild(cell);
+        // Adicionar linha de crescimento/decrescimento
+        if (index > 0) {
+            const growthRow = document.createElement("tr");
+            growthRow.innerHTML = `
+                <td>Variação</td>
+                <td id="growth-pieces-${index}"></td>
+                <td id="growth-sales-${index}"></td>
+                <td id="growth-piecesPerSale-${index}"></td>
+                <td id="growth-salesValue-${index}"></td>
+                <td id="growth-avgTicket-${index}"></td>
+            `;
+            tableBody.appendChild(growthRow);
         }
-        tableBody.appendChild(variationRow);
     });
 
-    function updateVariations() {
-        const rows = tableBody.querySelectorAll("tr");
-        for (let i = 2; i < rows.length; i += 2) {
-            const previousRow = rows[i - 2].querySelectorAll("input");
-            const currentRow = rows[i].querySelectorAll("input");
-            const variationCells = rows[i + 1].querySelectorAll(".variation-cell");
+    document.querySelectorAll(".input").forEach(input => {
+        input.addEventListener("input", (event) => {
+            const month = event.target.dataset.month;
+            const field = event.target.dataset.field;
+            const value = event.target.value;
 
-            previousRow.forEach((prevInput, index) => {
-                const prevValue = parseFloat(prevInput.value);
-                const currentValue = parseFloat(currentRow[index].value);
-                if (!isNaN(prevValue) && !isNaN(currentValue)) {
-                    const variation = ((currentValue - prevValue) / prevValue) * 100;
-                    variationCells[index].textContent = `${variation.toFixed(2)}%`;
-                    variationCells[index].classList.remove("variation-positive", "variation-negative");
-                    if (variation > 0) {
-                        variationCells[index].classList.add("variation-positive");
-                    } else if (variation < 0) {
-                        variationCells[index].classList.add("variation-negative");
-                    }
-                } else {
-                    variationCells[index].textContent = "";
-                    variationCells[index].classList.remove("variation-positive", "variation-negative");
-                }
-            });
+            if (!savedData[month]) {
+                savedData[month] = {};
+            }
+
+            savedData[month][field] = value;
+            localStorage.setItem("salesData", JSON.stringify(savedData));
+
+            // Atualizar crescimento/decrescimento
+            updateGrowth();
+        });
+    });
+
+    function updateGrowth() {
+        months.forEach((month, index) => {
+            if (index > 0) {
+                const prevData = savedData[index - 1] || {};
+                const currData = savedData[index] || {};
+
+                updateGrowthCell(`growth-pieces-${index}`, prevData.pieces, currData.pieces);
+                updateGrowthCell(`growth-sales-${index}`, prevData.sales, currData.sales);
+                updateGrowthCell(`growth-piecesPerSale-${index}`, prevData.piecesPerSale, currData.piecesPerSale);
+                updateGrowthCell(`growth-salesValue-${index}`, prevData.salesValue, currData.salesValue);
+                updateGrowthCell(`growth-avgTicket-${index}`, prevData.avgTicket, currData.avgTicket);
+            }
+        });
+    }
+
+    function updateGrowthCell(cellId, prevValue, currValue) {
+        const cell = document.getElementById(cellId);
+        if (cell) {
+            const prev = parseFloat(prevValue) || 0;
+            const curr = parseFloat(currValue) || 0;
+            const growth = ((curr - prev) / (prev || 1)) * 100;
+            cell.textContent = `${growth.toFixed(2)}%`;
         }
     }
-});
 
+    // Calcular crescimento/decrescimento inicial
+    updateGrowth();
+});
