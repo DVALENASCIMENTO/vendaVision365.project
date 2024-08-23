@@ -32,6 +32,15 @@ h1 {
     100% { background-position: 0% 50%; } /* Posição final do gradiente */
 }
 
+#filters {
+    margin-bottom: 20px; /* Adiciona um espaço entre os filtros e a tabela */
+}
+
+.year-input {
+    margin-bottom: 15px; /* Adiciona um espaço abaixo do input de ano */
+}
+
+
 table {
     width: 100%; /* Define a largura da tabela como 100% do contêiner */
     border-collapse: collapse; /* Remove os espaçamentos entre as células da tabela */
@@ -60,6 +69,12 @@ input {
     font-size: 0.6rem; /* Define o tamanho da fonte do input como 0.6rem */
     text-align: center; /* Centraliza o texto no input */
 }
+
+.month-name {
+    color: #FFD700; /* Amarelo */
+    font-weight: bold; /* Negrito para destacar os nomes dos meses */
+}
+
 
 footer {
     text-align: center; /* Centraliza o texto do rodapé */

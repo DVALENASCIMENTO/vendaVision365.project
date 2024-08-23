@@ -1,35 +1,43 @@
-<!DOCTYPE html> <!-- Define o documento como um arquivo HTML5 -->
-<html lang="pt-BR"> <!-- Inicia o documento HTML e define o idioma como português do Brasil -->
-<head> <!-- Cabeçalho do documento, contém metadados e links para recursos externos -->
-    <meta charset="UTF-8"> <!-- Define a codificação de caracteres como UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajusta a escala da viewport para dispositivos móveis -->
-    <title>VendaVision 365</title> <!-- Define o título da página que aparecerá na aba do navegador -->
-    <link rel="stylesheet" href="css/styles.css"> <!-- Vincula um arquivo CSS externo para estilização da página -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendaVision 365</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-<body> <!-- Início do corpo do documento, onde o conteúdo visível é definido -->
-    <h1 id="title">VendaVision 365</h1> <!-- Cabeçalho principal da página com o título do projeto -->
-    <table id="salesTable"> <!-- Início de uma tabela com um identificador único -->
-        <thead> <!-- Cabeçalho da tabela -->
-            <tr> <!-- Linha do cabeçalho da tabela -->
-                <th>Mês</th> <!-- Coluna do cabeçalho para "Mês" -->
-                <th>Quant Peças</th> <!-- Coluna do cabeçalho para "Quant Peças" -->
-                <th>Quant Vendas</th> <!-- Coluna do cabeçalho para "Quant Vendas" -->
-                <th>PV</th> <!-- Coluna do cabeçalho para "PV" (provavelmente Preço de Venda) -->
-                <th>Vendas</th> <!-- Coluna do cabeçalho para "Vendas" -->
-                <th>TM</th> <!-- Coluna do cabeçalho para "TM" (provavelmente Ticket Médio) -->
+<body>
+    <h1 id="title">VendaVision 365</h1>
+    <div id="filters">
+        <label for="salesPersonName">Nome do Vendedor:</label>
+        <input type="text" id="salesPersonName" placeholder="Digite o nome do vendedor">
+        <label for="year">Ano:</label>
+        <input type="number" id="year" placeholder="Digite o ano" min="2000" max="2099">
+    </div>
+    <table id="salesTable">
+        <thead>
+            <tr>
+                <th>Mês</th>
+                <th>Quant Peças</th>
+                <th>Quant Vendas</th>
+                <th>PV</th>
+                <th>Vendas</th>
+                <th>TM</th>
             </tr>
         </thead>
-        <tbody id="tableBody"> <!-- Corpo da tabela onde as linhas de dados serão inseridas -->
+        <tbody id="tableBody">
             <!-- As linhas dos meses serão adicionadas aqui pelo JavaScript -->
         </tbody>
     </table>
-    <footer> <!-- Rodapé da página -->
-        <p>Diego Vale do Nascimento - Analista e Desenvolvedor de Sistemas</p> <!-- Informação sobre o autor -->
+    <button id="savePdf">Salvar como PDF</button>
+    <footer>
+        <p>Diego Vale do Nascimento - Analista e Desenvolvedor de Sistemas</p>
         <p>
-            <a href="https://www.linkedin.com/in/diego-vale-do-nascimento-48212215b/" target="_blank">LinkedIn</a> | <!-- Link para o LinkedIn do autor -->
-            <a href="https://github.com/DVALENASCIMENTO" target="_blank">GitHub</a> <!-- Link para o GitHub do autor -->
+            <a href="https://www.linkedin.com/in/diego-vale-do-nascimento-48212215b/" target="_blank">LinkedIn</a> |
+            <a href="https://github.com/DVALENASCIMENTO" target="_blank">GitHub</a>
         </p>
     </footer>
-    <script src="js/script.js"></script> <!-- Vincula um arquivo JavaScript externo para adicionar funcionalidade à página -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="js/script.js"></script>
 </body>
-</html> <!-- Fim do documento HTML -->
+</html>
