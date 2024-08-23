@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tableBody.appendChild(growthRow);
     });
 
+    // LocalStorage
     document.querySelectorAll(".input").forEach(input => {
         input.addEventListener("input", (event) => {
             const month = event.target.dataset.month;
