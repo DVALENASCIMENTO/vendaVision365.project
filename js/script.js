@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     const tableBody = document.getElementById("tableBody");
-    const savedData = JSON.parse(localStorage.getItem("salesData")) || {};
+    const savedData = JSON.parse(localStorage.getItem("vendaVision365_salesData")) || {};
 
     months.forEach((month, index) => {
         const row = document.createElement("tr");
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             savedData[month][field] = value;
-            localStorage.setItem("salesData", JSON.stringify(savedData));
+            localStorage.setItem("vendaVision365_salesData", JSON.stringify(savedData));
             updateGrowth();
         });
     });
