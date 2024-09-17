@@ -6,6 +6,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const tableBody = document.getElementById("tableBody");
     const savedData = JSON.parse(localStorage.getItem("vendaVision365_salesData")) || {};
+    const salesPersonNameInput = document.getElementById("salesPersonName");
+    const yearInput = document.getElementById("year");
+
+    // Carregar Nome do Vendedor e Ano do localStorage
+    salesPersonNameInput.value = localStorage.getItem("vendaVision365_salesPersonName") || '';
+    yearInput.value = localStorage.getItem("vendaVision365_year") || '';
+
+    // Salvar Nome do Vendedor no localStorage
+    salesPersonNameInput.addEventListener("input", () => {
+        localStorage.setItem("vendaVision365_salesPersonName", salesPersonNameInput.value);
+    });
+
+    // Salvar Ano no localStorage
+    yearInput.addEventListener("input", () => {
+        localStorage.setItem("vendaVision365_year", yearInput.value);
+    });
 
     months.forEach((month, index) => {
         const row = document.createElement("tr");
