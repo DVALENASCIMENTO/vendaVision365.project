@@ -31,11 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
             <td><input type="number" class="input" data-month="${index}" data-field="sales" value="${savedData[index]?.sales || ''}"></td>
             <td><input type="number" class="input" data-month="${index}" data-field="piecesPerSale" value="${savedData[index]?.piecesPerSale || ''}"></td>
             <td><input type="number" class="input" data-month="${index}" data-field="salesValue" value="${savedData[index]?.salesValue || ''}"></td>
-            <td><input type="number" class="input" data-month="${index}" data-field="avgTicket" value="${savedData[index]?.avgTicket || ''}"></td>
+            <td><input type="number" class="input" data-month="${index}" data-field="tm" value="${savedData[index]?.tm || ''}"></td>
         `;
         tableBody.appendChild(row);
 
-        // Adiciona linha de variação abaixo da linha de Janeiro (índice 0) também
+        // Adiciona linha de variação abaixo da linha de Janeiro (índice 0)
         const growthRow = document.createElement("tr");
         growthRow.innerHTML = `
             <td>${index === 0 ? 'Variação (base)' : 'Variação'}</td>
@@ -43,12 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <td id="growth-sales-${index}"></td>
             <td id="growth-piecesPerSale-${index}"></td>
             <td id="growth-salesValue-${index}"></td>
-            <td id="growth-avgTicket-${index}"></td>
+            <td id="growth-tm-${index}"></td>
         `;
         tableBody.appendChild(growthRow);
     });
 
-    // LocalStorage
+    // Atualiza os valores no localStorage e recalcula PV e TM
     document.querySelectorAll(".input").forEach(input => {
         input.addEventListener("input", (event) => {
             const month = event.target.dataset.month;
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             savedData[month][field] = value;
             localStorage.setItem("vendaVision365_salesData", JSON.stringify(savedData));
-            calculatePV(month);  // Calcula a coluna "PV" ao inserir valores
+            calculatePV(month);  // Recalcula "PV" e "TM" após inserção
             updateGrowth();
         });
     });
@@ -69,15 +69,25 @@ document.addEventListener("DOMContentLoaded", () => {
     function calculatePV(month) {
         const pieces = parseFloat(savedData[month]?.pieces) || 0;
         const sales = parseFloat(savedData[month]?.sales) || 0;
-        const pv = sales ? (pieces / sales).toFixed(2) : 0;
+        const salesValue = parseFloat(savedData[month]?.salesValue) || 0;
 
+        // Cálculo de peças por venda (PV)
+        const pv = sales ? (pieces / sales).toFixed(2) : 0;
         const piecesPerSaleInput = document.querySelector(`input[data-month="${month}"][data-field="piecesPerSale"]`);
         if (piecesPerSaleInput) {
             piecesPerSaleInput.value = pv;
         }
 
+        // Cálculo de Ticket Médio (TM)
+        const tm = sales ? (salesValue / sales).toFixed(2) : 0;
+        const tmInput = document.querySelector(`input[data-month="${month}"][data-field="tm"]`);
+        if (tmInput) {
+            tmInput.value = tm;
+        }
+
         // Atualiza o valor no localStorage
         savedData[month].piecesPerSale = pv;
+        savedData[month].tm = tm;
         localStorage.setItem("vendaVision365_salesData", JSON.stringify(savedData));
     }
 
@@ -91,14 +101,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateGrowthCell(`growth-sales-${index}`, prevData.sales, currData.sales);
                 updateGrowthCell(`growth-piecesPerSale-${index}`, prevData.piecesPerSale, currData.piecesPerSale);
                 updateGrowthCell(`growth-salesValue-${index}`, prevData.salesValue, currData.salesValue);
-                updateGrowthCell(`growth-avgTicket-${index}`, prevData.avgTicket, currData.avgTicket);
+                updateGrowthCell(`growth-tm-${index}`, prevData.tm, currData.tm);
             } else {
                 // Linha de variação para Janeiro
                 updateGrowthCell(`growth-pieces-${index}`, 0, savedData[index]?.pieces);
                 updateGrowthCell(`growth-sales-${index}`, 0, savedData[index]?.sales);
                 updateGrowthCell(`growth-piecesPerSale-${index}`, 0, savedData[index]?.piecesPerSale);
                 updateGrowthCell(`growth-salesValue-${index}`, 0, savedData[index]?.salesValue);
-                updateGrowthCell(`growth-avgTicket-${index}`, 0, savedData[index]?.avgTicket);
+                updateGrowthCell(`growth-tm-${index}`, 0, savedData[index]?.tm);
             }
         });
     }
@@ -126,19 +136,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateGrowth();
 
+    // Geração de PDF
     document.getElementById("savePdf").addEventListener("click", () => {
         const element = document.body; // Define o conteúdo que será convertido em PDF
 
         const opt = {
-            margin:       1,
-            filename:     'VendaVision_365.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-            
+            margin: 1,
+            filename: 'VendaVision_365.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
         html2pdf().from(element).set(opt).save();
-        // Usa a biblioteca html2pdf para gerar e salvar o PDF
     });
 });
