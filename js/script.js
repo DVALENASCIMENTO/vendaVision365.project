@@ -27,11 +27,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td class="month-name">${month}</td>
-            <td><input type="number" class="input" data-month="${index}" data-field="pieces" value="${savedData[index]?.pieces || ''}"></td>
-            <td><input type="number" class="input" data-month="${index}" data-field="sales" value="${savedData[index]?.sales || ''}"></td>
-            <td><input type="number" class="input" data-month="${index}" data-field="piecesPerSale" value="${savedData[index]?.piecesPerSale || ''}"></td>
-            <td><input type="number" class="input" data-month="${index}" data-field="salesValue" value="${savedData[index]?.salesValue || ''}"></td>
-            <td><input type="number" class="input" data-month="${index}" data-field="tm" value="${savedData[index]?.tm || ''}"></td>
+            <td><input type="text" class="input" data-month="${index}" data-field="pieces" value="${formatCurrency(savedData[index]?.pieces || '')}"></td>
+            <td><input type="text" class="input" data-month="${index}" data-field="sales" value="${formatCurrency(savedData[index]?.sales || '')}"></td>
+            <td><input type="text" class="input" data-month="${index}" data-field="piecesPerSale" value="${formatCurrency(savedData[index]?.piecesPerSale || '')}"></td>
+            <td><input type="text" class="input" data-month="${index}" data-field="salesValue" value="${formatCurrency(savedData[index]?.salesValue || '')}"></td>
+            <td><input type="text" class="input" data-month="${index}" data-field="tm" value="${formatCurrency(savedData[index]?.tm || '')}"></td>
         `;
         tableBody.appendChild(row);
 
@@ -55,14 +55,22 @@ document.addEventListener("DOMContentLoaded", () => {
             const field = event.target.dataset.field;
             const value = event.target.value;
 
+            // Remove a formatação e salva o valor limpo
+            const cleanValue = parseCurrency(value);
+
             if (!savedData[month]) {
                 savedData[month] = {};
             }
 
-            savedData[month][field] = value;
+            savedData[month][field] = cleanValue;
             localStorage.setItem("vendaVision365_salesData", JSON.stringify(savedData));
             calculatePV(month);  // Recalcula "PV" e "TM" após inserção
             updateGrowth();
+        });
+
+        // Selecionar o texto ao clicar
+        input.addEventListener("focus", (event) => {
+            event.target.select();
         });
     });
 
@@ -75,14 +83,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const pv = sales ? (pieces / sales).toFixed(2) : 0;
         const piecesPerSaleInput = document.querySelector(`input[data-month="${month}"][data-field="piecesPerSale"]`);
         if (piecesPerSaleInput) {
-            piecesPerSaleInput.value = pv;
+            piecesPerSaleInput.value = formatCurrency(pv);
         }
 
         // Cálculo de Ticket Médio (TM)
         const tm = sales ? (salesValue / sales).toFixed(2) : 0;
         const tmInput = document.querySelector(`input[data-month="${month}"][data-field="tm"]`);
         if (tmInput) {
-            tmInput.value = tm;
+            tmInput.value = formatCurrency(tm);
         }
 
         // Atualiza o valor no localStorage
@@ -132,6 +140,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.classList.add("variation-negative");
             }
         }
+    }
+
+    function formatCurrency(value) {
+        const number = parseFloat(value) || 0;
+        return number.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function parseCurrency(value) {
+        return value.replace(/\./g, '').replace(',', '.');
     }
 
     updateGrowth();
