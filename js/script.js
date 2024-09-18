@@ -61,9 +61,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
             savedData[month][field] = value;
             localStorage.setItem("vendaVision365_salesData", JSON.stringify(savedData));
+            calculatePV(month);  // Calcula a coluna "PV" ao inserir valores
             updateGrowth();
         });
     });
+
+    function calculatePV(month) {
+        const pieces = parseFloat(savedData[month]?.pieces) || 0;
+        const sales = parseFloat(savedData[month]?.sales) || 0;
+        const pv = sales ? (pieces / sales).toFixed(2) : 0;
+
+        const piecesPerSaleInput = document.querySelector(`input[data-month="${month}"][data-field="piecesPerSale"]`);
+        if (piecesPerSaleInput) {
+            piecesPerSaleInput.value = pv;
+        }
+
+        // Atualiza o valor no localStorage
+        savedData[month].piecesPerSale = pv;
+        localStorage.setItem("vendaVision365_salesData", JSON.stringify(savedData));
+    }
 
     function updateGrowth() {
         months.forEach((month, index) => {
@@ -119,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2 },
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            
         };
 
         html2pdf().from(element).set(opt).save();
